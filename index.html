@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Ask Anything UI</title>
+<style>
+  :root {
+    --bg: #000;
+    --input-bg: #1e1e1e;
+    --icon-bg: #2b2b2b;
+    --text-muted: #999;
+    --white: #fff;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    background: var(--bg);
+    font-family: "Inter", "Segoe UI", sans-serif;
+    padding: 20px;
+    color: var(--white);
+  }
+
+  /* 🔹 Top image */
+  .top-image {
+    margin-top:0;
+    padding-top:0;
+    position: absolute;
+    top:-12px;
+    min-width: 100vw;
+    min-height: 90vh;
+    
+   }
+
+  /* 🔹 Bottom bar container */
+  .bottom-bar {
+    width: 100vw;
+    max-width: 800px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(20, 20, 20, 0.9);
+    box-shadow: 0 0 20px rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    padding-bottom:240px;
+    position:absolute;
+    bottom:0px;
+  }
+
+  /* 🔹 Buttons */
+  .icon-btn, .voice-btn {
+    border: none;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+  }
+
+  .icon-btn {
+    width: 50px;
+    max-height: 40px;
+    border-radius: 50%;
+    background: var(--icon-bg);
+  }
+
+  .icon-btn:hover {
+    background: #3a3a3a;
+  }
+
+  .voice-btn {
+    max-width: 35px;
+    max-height: 35px;
+    border-radius: 50%;
+    background: var(--white);
+  }
+
+  .voice-btn:hover {
+    transform: scale(1.05);
+  }
+
+  .icon-btn svg, .voice-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* 🔹 Input pill */
+  .input-pill {
+    flex: 1;
+    background: var(--input-bg);
+    border-radius: 25px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    max-width:70vw;
+    padding: 0 15px;
+    position: relative;
+    box-shadow: inset 0 0 4px rgba(255,255,255,0.05);
+  }
+
+  .input-pill input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--white);
+    font-size: 16px;
+    font-family: inherit;
+    caret-color: var(--white);
+  }
+
+  .input-pill input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .mic-icon {
+    width: 22px;
+    height: 22px;
+    opacity: 0.8;
+    margin-left: 8px;
+  }
+
+  @media (max-width: 480px) {
+    .top-image {
+      width: 90px;
+      height: 90px;
+    }
+
+    .bottom-bar {
+      gap: 8px;
+      padding: 8px;
+    }
+
+    .input-pill {
+      height: 45px;
+      padding: 0 12px;
+    }
+
+    .icon-btn, .voice-btn {
+      width: 45px;
+      height: 45px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- 🔹 Top image -->
+<img src="IMG_20251007_100249.jpg" alt="AI Avatar" class="top-image">
+
+<!-- 🔹 Bottom bar -->
+<div class="bottom-bar" >
+  <!-- Left image button -->
+  <button class="icon-btn" title="Attach image">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="white" stroke-width="1.5" viewBox="0 0 24 24">
+      <rect x="3" y="5" width="17" height="12" rx="2"/>
+      <circle cx="8.5" cy="9.5" r="1.5"/>
+      <path d="M3 17l4.5-4.5 3.5 3.5L16 10l4 4"/>
+    </svg>
+  </button>
+
+  <!-- Input field -->
+  <!-- Input field with mic icon (inline CSS) -->
+<div style="flex:1;background:#2b2b2b;border-radius:25px;height:45px;max-width:84vw;display:flex;align-items:center;padding:0 15px;color:#fff;position:relative;">
+<input type="text" placeholder="Ask anything" id="chatInput"
+  style="flex:1;background:transparent;border:none;outline:none;color:#fff;font-size:16px;font-family:inherit;caret-color:#fff;"
+/>
+  <svg id="micIcon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="white" stroke-width="1.5" viewBox="0 0 24 24"
+    style="width:24px;height:24px;opacity:0.8;flex-shrink:0;position:relative;left:-10px;">
+    <path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3z"/>
+    <path d="M19 11v1a7 7 0 0 1-14 0v-1"/>
+    <path d="M12 19v2"/>
+  </svg>
+
+
+  <!-- Right voice button -->
+  <button class="voice-btn" id="voiceBtn" title="Voice input">
+
+<svg id="Waves" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <rect x="2" y="9" width="2.5" height="6" rx="1" fill="#111"/>
+  <rect x="6" y="7" width="2.5" height="10" rx="1" fill="#111"/>
+  <rect x="10" y="4" width="2.5" height="16" rx="1" fill="#111"/>
+  <rect x="14" y="7" width="2.5" height="10" rx="1" fill="#111"/>
+  <rect x="18" y="9" width="2.5" height="6" rx="1" fill="#111"/>
+</svg>
+
+<svg style="display:none;"id="ArrowUp" class="arrowup" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <line x1="12" y1="19" x2="12" y2="5"></line>
+  <polyline points="5 12 12 5 19 12"></polyline>
+</svg>
+
+  </button>
+  </div>
+</div>
+<script>
+  const voiceBtn = document.getElementById("voiceBtn");
+  voiceBtn.addEventListener("click", () => {
+    voiceBtn.style.transform = "scale(0.9)";
+    setTimeout(() => (voiceBtn.style.transform = "scale(1)"), 150);
+  });
+  function toggleMic() {
+  const mic = document.getElementById('micIcon');
+
+  // toggle visibility
+  mic.style.visibility = (mic.style.visibility === 'hidden') ? 'visible' : 'hidden';
+}
+function toggleSVGs() {
+  const waves = document.getElementById('Waves');
+  const arrow = document.getElementById('ArrowUp');
+
+  if (waves.style.display !== 'none') {
+    waves.style.display = 'none';
+    arrow.style.display = 'block';
+  } else {
+    waves.style.display = 'block';
+    arrow.style.display = 'none';
+  }
+}
+  const input = document.getElementById('chatInput');
+const responseDiv = document.getElementById('response');
+
+let firstCharTyped = false;
+
+input.addEventListener('input', () => {
+  const text = input.value.trim();
+
+  if (!firstCharTyped && text.length > 0) {
+    toggleSVGs();
+    firstCharTyped = true;
+    toggleMic();
+    voiceBtn.style.transform = "scale(0.9)";
+    setTimeout(() => (voiceBtn.style.transform = "scale(1)"), 150);
+  } else if (text.length === 0) {
+    firstCharTyped = false; // reset if input is cleared
+    toggleMic();
+    toggleSVGs();
+   
+    voiceBtn.style.transform = "scale(0.9)";
+    setTimeout(() => (voiceBtn.style.transform = "scale(1)"), 150);
+  }
+  
+});
+  voiceBtn.addEventListener('click', () => {
+  const text = input.value.trim();
+  if (!text) return; // do nothing if input is empty
+
+  // Get existing data from localStorage
+  let storedData = JSON.parse(localStorage.getItem('chatHistory')) || [];
+
+  // Add new entry with current time
+  storedData.push({
+    text: text,
+    timestamp: new Date().toISOString() // ISO string format
+  });
+
+  // Save back to localStorage
+  localStorage.setItem('chatHistory', JSON.stringify(storedData));
+
+  console.log('Saved:', storedData);
+
+  // Optional: clear input after saving
+  input.value = '';
+    window.location.href = "plan.html";
+});
+</script>
+
+</body>
+</html>
