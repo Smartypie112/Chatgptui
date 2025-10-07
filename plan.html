@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yes/No Flow with Input and Searches</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    flex-direction: column;
+  }
+  .buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 20px;
+  }
+  button {
+    padding: 10px 20px;
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s;
+  }
+  button.yes { background-color: green; color: white; }
+  button.no { background-color: red; color: white; }
+  button:hover { opacity: 0.8; }
+
+  /* Modal styling */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.8);
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+  }
+  .modal-content {
+    background: #222;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    max-height: 80vh;
+    width: 90%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .modal input {
+    padding: 10px;
+    font-size: 16px;
+    width: 80%;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: none;
+  }
+  .modal button {
+    padding: 10px 20px;
+    margin-top: 10px;
+  }
+  .reason-item {
+    background: #333;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    text-align: left;
+  }
+  #reasonsList, #searchesList {
+    overflow-y: scroll;
+    max-height: 300px;
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
+
+<div id="question">I know this data is useful but, Can you take data after 6 p.m, Because it can destroy your discipline.</div>
+
+<div class="buttons">
+  <button class="yes" id="yesBtn">Yes</button>
+  <button class="no" id="noBtn">No</button>
+</div>
+
+<button class="yes" id="viewDataBtn" style="background:#555;position:relative;top:33vh;">View Reasons</button>
+<button class="yes" id="viewSearchBtn" style="background:yellow;color:black;position:relative;top:35vh;">View Searches</button>
+
+<!-- Input Modal -->
+<div class="modal" id="inputModal">
+  <div class="modal-content">
+    <h3>Why are you free now?</h3>
+    <input type="text" id="reasonInput" placeholder="Type your reason here">
+    <br>
+    <button id="submitReason">Submit</button>
+  </div>
+</div>
+
+<!-- Reasons Modal -->
+<div class="modal" id="reasonsModal">
+  <div class="modal-content">
+    <h3>All Saved Reasons</h3>
+    <div id="reasonsList"></div>
+    <button id="closeReasons">Close</button>
+  </div>
+</div>
+
+<!-- Searches Modal -->
+<div class="modal" id="searchesModal">
+  <div class="modal-content">
+    <h3>All Searches</h3>
+    <div id="searchesList"></div>
+    <button id="closeSearches">Close</button>
+  </div>
+</div>
+
+<script>
+const questionDiv = document.getElementById('question');
+const yesBtn = document.getElementById('yesBtn');
+const noBtn = document.getElementById('noBtn');
+
+const inputModal = document.getElementById('inputModal');
+const reasonInput = document.getElementById('reasonInput');
+const submitReason = document.getElementById('submitReason');
+
+const viewDataBtn = document.getElementById('viewDataBtn');
+const reasonsModal = document.getElementById('reasonsModal');
+const reasonsList = document.getElementById('reasonsList');
+const closeReasons = document.getElementById('closeReasons');
+
+const viewSearchBtn = document.getElementById('viewSearchBtn');
+const searchesModal = document.getElementById('searchesModal');
+const searchesList = document.getElementById('searchesList');
+const closeSearches = document.getElementById('closeSearches');
+
+const flow = [
+  { question: "I know this data is useful but, Can you take data after 6 p.m, Because it can destroy your discipline.", yes: 1, no: 2 },
+  { question: "Great! I am happy to see you growing, Well, I think you're free can I ask you why ?", yes: "modal", no: 4 },
+  { question: "Well, Its an option chosen by Weaks, Maybe you won't win in life ?", yes: 5, no: 6 },
+  { question: "Awesome! If you have work, then complete it now and if you completed all, Enjoy babe !", yes: null, no: null },
+  { question: "So, You're responsible for Future on going thing. It's you who is in now.", yes: null, no: null },
+  { question: "Weaks think they're perfect and strong, doubt themselves after being the best...", yes: null, no: null },
+  { question: "Then, Stop now get to the work.", yes: null, no: null }
+];
+
+let currentStep = 0;
+
+function showStep(index) {
+  if (index === null) return;
+  currentStep = index;
+  questionDiv.textContent = flow[index].question;
+}
+
+yesBtn.addEventListener('click', () => {
+  let next = flow[currentStep].yes;
+  if(next === "modal"){
+    inputModal.style.display = "flex";
+  } else {
+    showStep(next);
+  }
+});
+
+noBtn.addEventListener('click', () => {
+  const next = flow[currentStep].no;
+  showStep(next);
+});
+
+submitReason.addEventListener('click', () => {
+  const reason = reasonInput.value.trim();
+  if(reason){
+    const dateTime = new Date().toLocaleString();
+    let savedReasons = JSON.parse(localStorage.getItem('freeReasons') || '[]');
+    savedReasons.push({ reason, dateTime });
+    localStorage.setItem('freeReasons', JSON.stringify(savedReasons));
+    inputModal.style.display = "none";
+    reasonInput.value = "";
+    alert("Reason saved!");
+    showStep(3);
+  }
+});
+
+viewDataBtn.addEventListener('click', () => {
+  let savedReasons = JSON.parse(localStorage.getItem('freeReasons') || '[]');
+  reasonsList.innerHTML = '';
+  if(savedReasons.length === 0){
+    reasonsList.innerHTML = "<p>No reasons saved yet!</p>";
+  } else {
+    savedReasons.slice().reverse().forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'reason-item';
+      div.textContent = `[${item.dateTime}] - ${item.reason}`;
+      reasonsList.appendChild(div);
+    });
+  }
+  reasonsModal.style.display = 'flex';
+});
+
+closeReasons.addEventListener('click', () => {
+  reasonsModal.style.display = 'none';
+});
+
+viewSearchBtn.addEventListener('click', () => {
+  let savedSearches = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+  searchesList.innerHTML = '';
+  if(savedSearches.length === 0){
+    searchesList.innerHTML = "<p>No searches yet!</p>";
+  } else {
+    savedSearches.slice().reverse().forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'reason-item';
+      const date = new Date(item.timestamp).toLocaleString();
+      div.textContent = `[${date}] - ${item.text}`;
+      searchesList.appendChild(div);
+    });
+  }
+  searchesModal.style.display = 'flex';
+});
+
+closeSearches.addEventListener('click', () => {
+  searchesModal.style.display = 'none';
+});
+
+// Close modals if clicked outside content
+window.addEventListener('click', (e) => {
+  if(e.target === inputModal) inputModal.style.display = 'none';
+  if(e.target === reasonsModal) reasonsModal.style.display = 'none';
+  if(e.target === searchesModal) searchesModal.style.display = 'none';
+});
+
+// Initialize
+showStep(0);
+</script>
+
+</body>
+</html>
